@@ -60,7 +60,7 @@ Developer pushes code
     +----+----+
          |
          v
-   CI Results
+     CI Results
 ```
 
 ## 6. Workflow Jobs
@@ -68,7 +68,7 @@ Developer pushes code
 ### Job 1: Lint
 
 - Checks Python code using Ruff.
-- Identifies code quality and formatting issues.
+- Identifies code quality issues.
 - Reports linting failures in GitHub Actions.
 
 Command:
@@ -107,14 +107,21 @@ github-actions-practice/
 
 Before pushing the code, both checks were executed locally.
 
+**Lint command:**
+
 ```bash
 ruff check .
+```
+
+**Test command:**
+
+```bash
 python -m pytest -v
 ```
 
-**Test Result:** 5 test cases passed successfully.
-
-**Lint Result:** All checks passed.
+**Results:**
+- Test Result: All 5 test cases passed successfully.
+- Lint Result: All checks passed.
 
 ## 9. GitHub Actions Execution Results
 
@@ -124,24 +131,60 @@ The workflow was successfully triggered through both Push and Pull Request event
 - Test job – Successful
 - Pull Request CI checks – Successful
 
-## 10. Key Learnings
+### 9.1 GitHub Actions Workflow
+
+![GitHub Actions workflow](screenshots/Screenshot%20(748).png)
+
+### 9.2 Lint Job Execution
+
+![Lint job execution](screenshots/Screenshot%20(749).png)
+
+### 9.3 Test Job Execution
+
+![Test job execution](screenshots/Screenshot%20(750).png)
+
+### 9.4 Pull Request CI Checks
+
+![Pull Request CI checks](screenshots/Screenshot%20(751).png)
+
+## 10. GitHub Rulesets and Branch Protection
+
+GitHub Rulesets help protect the `main` branch by defining rules that must be followed before changes can be merged.
+
+Configured protections include:
+
+- Require a Pull Request before merging.
+- Require status checks to pass.
+- Configure Lint and Test as required status checks.
+
+### 10.1 Ruleset Configuration
+
+![GitHub Ruleset configuration](screenshots/Screenshot%20(752).png)
+
+### 10.2 Required Status Checks
+
+![Required status checks](screenshots/Screenshot%20(753).png)
+
+## 11. Key Learnings
 
 - Understanding GitHub Actions workflow structure.
-- Configuring push and Pull Request triggers.
+- Configuring `push` and `pull_request` triggers.
 - Understanding jobs, steps, runners, and actions.
-- Automating linting and testing.
+- Automating code linting and testing.
 - Understanding CI status checks.
-- Learning how branch Rulesets can enforce required checks before merging.
+- Learning how GitHub Rulesets help protect branches.
 
-## 11. Workflow Configuration
+## 12. Workflow Configuration
 
-The actual workflow configuration is maintained in:
+The workflow configuration is maintained in:
 
 `workflow/ci.yml`
 
-This is a reference copy of the workflow used in the separate practice repository.
+This is a reference copy of the actual workflow used in the separate practice repository.
 
----
+## 13. Final Outcome
+
+Successfully created and tested a GitHub Actions CI workflow that automatically runs Ruff linting and Pytest whenever code is pushed or a Pull Request is created.
 
 **Status:** Completed
 
