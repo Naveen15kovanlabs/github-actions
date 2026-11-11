@@ -1,4 +1,4 @@
-# GitHub Actions – Hands-on Practice
+# GitHub Actions 
 
 ## Overview
 
