@@ -1,0 +1,104 @@
+name: Workflow Triggers workflow_dispatch with inputs, schedule, paths filters
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment for this run
+        type: choice
+        options:
+          - dev
+          - staging
+          - production
+        default: dev
+        required: true
+      run_tests:
+        description: Run the automated tests
+        type: boolean
+        default: true
+        required: true
+  schedule:
+    - cron: "*/5 * * * *"
+  push:
+    branches:
+      - main
+    paths:
+      - "**/*.py"
+      - "requirements.txt"
+      - "pyproject.toml"
+      - ".github/workflows/**"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "**/*.py"
+      - "requirements.txt"
+      - "pyproject.toml"
+      - ".github/workflows/**"
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint Python code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            pyproject.toml
+
+      - name: Install project dependencies
+        run: python -m pip install -r requirements.txt ".[dev]"
+
+      - name: Report trigger and manual inputs
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          SELECTED_ENVIRONMENT: ${{ inputs.environment }}
+          RUN_TESTS: ${{ inputs.run_tests }}
+        run: |
+          echo "Event type: ${EVENT_NAME}"
+          if [ "${EVENT_NAME}" = "workflow_dispatch" ]; then
+            echo "Selected environment: ${SELECTED_ENVIRONMENT}"
+            echo "Run automated tests: ${RUN_TESTS}"
+          fi
+
+      - name: Run Ruff
+        run: python -m ruff check .
+
+  test:
+    name: Run automated tests
+    if: github.event_name != 'workflow_dispatch' || inputs.run_tests == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            pyproject.toml
+
+      - name: Install project dependencies
+        run: python -m pip install -r requirements.txt ".[dev]"
+
+      - name: Run root project tests
+        working-directory: src
+        env:
+          PYTHONPATH: ..
+        run: python -m pytest -c ../pyproject.toml ../tests --ignore=../tests/test_analyzer.py --import-mode=importlib -v
+
+      - name: Run root incident analyzer tests
+        run: python -m pytest --noconftest tests/test_analyzer.py -v
