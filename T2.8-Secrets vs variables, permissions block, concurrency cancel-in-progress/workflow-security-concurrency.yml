@@ -1,0 +1,63 @@
+name: Workflow Security and Concurrency Practice
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/workflow-security-concurrency.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/workflow-security-concurrency.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-workflow-settings:
+    name: Verify secrets and variables handling
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Check non-sensitive configuration
+        env:
+          RAG_ENVIRONMENT: ${{ vars.RAG_ENVIRONMENT }}
+        run: |
+          if [ -n "$RAG_ENVIRONMENT" ]; then
+            echo "RAG_ENVIRONMENT repository variable is configured."
+          else
+            echo "RAG_ENVIRONMENT repository variable is not configured."
+          fi
+
+      - name: Validate Groq API key
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          if [ -z "$GROQ_API_KEY" ]; then
+            echo "::error::GROQ_API_KEY secret is not configured."
+            exit 1
+          fi
+
+          status=$(curl --silent --show-error \
+            --max-time 15 \
+            --output /dev/null \
+            --write-out "%{http_code}" \
+            --header "Authorization: Bearer $GROQ_API_KEY" \
+            https://api.groq.com/openai/v1/models)
+
+          if [ "$status" != "200" ]; then
+            echo "::error::Groq rejected the key or request (HTTP $status)."
+            exit 1
+          fi
+
+          echo "Groq accepted the API key."
