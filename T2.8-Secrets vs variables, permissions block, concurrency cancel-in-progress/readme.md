@@ -13,8 +13,7 @@ I created a separate workflow file for this task without modifying my previous C
 ### 1. Repository Secret Configuration
 
 I configured a repository secret named `GROQ_API_KEY` under Settings → Secrets and variables → Actions. This helps me store sensitive API credentials securely instead of directly adding them to the workflow YAML file.
-
-![Repository Secret Configuration](https://github.com/Naveen15github/github-actions/blob/14baf858d24e6047ac14d87df58aba7266520db9/T2.8-Secrets%20vs%20variables%2C%20permissions%20block%2C%20concurrency%20cancel-in-progress/images/Screenshot%202026-11-13%20142516.png)
+![Repository Secret Configuration](images/Screenshot%202026-11-13%20142516.png)
 
 ### 2. Permissions and Concurrency Configuration
 
@@ -22,7 +21,7 @@ I added a permissions block with `contents: read` to keep the default workflow t
 
 I also configured concurrency using a group based on the workflow and pull request number or branch reference. With `cancel-in-progress: true`, older running workflows in the same group are cancelled when a new run starts.
 
-![Permissions and Concurrency Configuration](https://github.com/Naveen15github/github-actions/blob/14baf858d24e6047ac14d87df58aba7266520db9/T2.8-Secrets%20vs%20variables%2C%20permissions%20block%2C%20concurrency%20cancel-in-progress/images/Screenshot%20%28770%29.png)
+![Permissions and Concurrency Configuration](images/Screenshot%20%28770%29.png)
 
 ### 3. Successful Workflow Execution
 
@@ -30,7 +29,7 @@ After configuring the workflow, I triggered a run and verified that the workflow
 
 The verification job finished without failure, confirming that the workflow configuration was working.
 
-![Successful GitHub Actions Workflow](https://github.com/Naveen15github/github-actions/blob/14baf858d24e6047ac14d87df58aba7266520db9/T2.8-Secrets%20vs%20variables%2C%20permissions%20block%2C%20concurrency%20cancel-in-progress/images/Screenshot%20%282026-11-13%20143119%29.png)
+![Successful Workflow Execution](images/Screenshot%202026-11-13%20143119.png)
 
 ## What I Implemented
 
